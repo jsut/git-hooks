@@ -1,0 +1,49 @@
+#!/bin/sh
+#
+# this is a git update hook which will reject a push if any of the commits in
+# the push are missing a specific token, in this case 'bill:'.  This is a hook
+# I wanted and didn't turn up in a cursory google, so i wrote it.  Code is
+# as-is, use at your own discretion.  I make no claims that it actually works
+# as it should, and i'm pretty sure that it won't behave well with merge
+# commits, but at the moment it serves my purpose.  Patches Welcome!
+#
+# obvious TODO's
+#
+# - token configuration
+# - handle merge commits (if it's a problem)
+#
+
+# --- Command line
+refname="$1"
+oldrev="$2"
+newrev="$3"
+
+# --- Safety check
+if [ -z "$GIT_DIR" ]; then
+	echo "Don't run this script from the command line." >&2
+	echo " (if you want, you could supply GIT_DIR then run" >&2
+	echo "  $0 <ref> <oldrev> <newrev>)" >&2
+	exit 1
+fi
+
+if [ -z "$refname" -o -z "$oldrev" -o -z "$newrev" ]; then
+	echo "Usage: $0 <ref> <oldrev> <newrev>" >&2
+	exit 1
+fi
+
+raw=$(git log $oldrev..$newrev --pretty="format:%H" )
+
+declare -a hashes
+hashes=(`echo $raw`)
+
+for hash in ${hashes[@]};
+do
+  bill=$(git log -1 $hash | grep 'bill:')
+  if [ -z "$bill" ]; then
+      echo "rejecting push due to commit: $hash" >&2
+      echo "commit message does not include a bill: statement" >&2
+      exit 1
+  fi
+done
+
+exit 0
