@@ -1,0 +1,9 @@
+=pod
+
+=head1 git-hooks
+
+=head2 description
+
+Currently this repository contains a single git update hook enables a server
+to reject attempts to push if any commit in the push is missing a particular
+token.
