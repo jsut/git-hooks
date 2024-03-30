@@ -4,6 +4,11 @@
 
 =head2 description
 
-Currently this repository contains a single git update hook enables a server
-to reject attempts to push if any commit in the push is missing a particular
-token.
+Currently this repository contains a couple of git hooks that I made
+
+require_commit_token is a git update hook enables a server to reject attempts
+to push if any commit in the push is missing a particular token.
+
+remix_pre_commit is a git pre-commit hook that will run tsc, eslint, and
+prettier pre-commit to attempt to validate / format your code prior to commit.
+It handles partially staged changes gracefully (mostly anyway?)
